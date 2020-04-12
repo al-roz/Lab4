@@ -54,6 +54,25 @@ void add(LIST* head, ENTRY* addValue)
 	curr->next = tmp;
 }
 
+void delete(LIST* head, char* sername)
+{
+	while (head)
+	{
+		if (head->next == 0) {
+			printf("Такого ученика нет\n");
+			return 0;
+		}
+		if (strcmp(head->next->person.sernam, sername) == 0)
+		{
+			head->next = head->next->next;
+			return 0;
+		}
+		
+		head = head->next;
+		
+	}
+}
+
 void output(LIST* head)
 {
 	while (head)
@@ -80,34 +99,66 @@ int main()
 	int k = 1;
 	while (1)
 	{
-		printf("Введите данные для добавления(фамилия, имя, возраст, группа, телефон,(оценки - 5 штук), начиная с новой строки\n");
-		char s[256];
+		char key, re;
+		printf("Выберите действие:\n");
+		printf("1.Добавить ученика в список\n");
+		printf("2.Удалить ученика из списка\n");
+		printf("3.Вывести учащихся из списка\n");
+
 		
-		addValue.id = k;
-		k++;
+		scanf_s("%c", &key);
+		scanf_s("%c",&re);
 
-		gets(s);
-		addValue.sernam = (char*)malloc(strlen(s) * sizeof(char));
-		strcpy_s(addValue.sernam,strlen(s)+1, s);
+		switch (key)
+		{
+		case '1' :
+			printf("Введите данные для добавления(фамилия, имя, возраст, группа, телефон,(оценки - 5 штук), начиная с новой строки\n");
+			char s[256];
 
-		gets(s);
-		addValue.name = (char*)malloc(strlen(s) * sizeof(char));
-		strcpy_s(addValue.name, strlen(s) + 1, s);
+			addValue.id = k;
+			k++;
 
-		scanf_s("%d", &addValue.old);
-		gets(s);
+			gets(s);
+			addValue.sernam = (char*)malloc(strlen(s) * sizeof(char));
+			strcpy_s(addValue.sernam, strlen(s) + 1, s);
 
-		gets(s);
-		addValue.grup = (char*)malloc(strlen(s) * sizeof(char));
-		strcpy_s(addValue.grup, strlen(s) + 1, s);
+			gets(s);
+			addValue.name = (char*)malloc(strlen(s) * sizeof(char));
+			strcpy_s(addValue.name, strlen(s) + 1, s);
 
-		gets(addValue.telephonNumber);
+			scanf_s("%d", &addValue.old);
+			gets(s);
+
+			gets(s);
+			addValue.grup = (char*)malloc(strlen(s) * sizeof(char));
+			strcpy_s(addValue.grup, strlen(s) + 1, s);
+
+			gets(addValue.telephonNumber);
+
+			for (int i = 0; i < 5; i++)
+				scanf_s("%d", &addValue.assessments[i]);
+			scanf_s("%c", &re);
+			add(head, &addValue);
+			scanf_s("%c", &re);
+			
+			break;
+
+		case '2' :
+			printf("Введите фамилию\n");
+			char sername[20];
+			gets(sername);
+			delete(head, sername);
+			break;
+		case '3' :
+			output(head);
+			break;
+		default:
+			break;
+		}
+
 		
-		for (int i = 0; i < 5; i++)
-			scanf_s("%d",&addValue.assessments[i]);
-			   		 
-		add(head, &addValue);
-		output(head);
+		
+
 	}
 
 	
