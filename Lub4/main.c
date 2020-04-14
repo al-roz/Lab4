@@ -24,6 +24,33 @@ struct list
 };
 typedef struct list LIST;
 
+int MyStrLen(char* string)
+{
+	int i = 0;
+	while (string[i] != 0)
+	{
+		i++;
+	}
+	return i;
+}
+
+
+// return 0 - отсутсвие заданной поодстроки
+// return 1 - существует заданная подстрока 
+int FlagSubString(char* string, char* subString, int pos)
+{
+	int SizeString = MyStrLen(string);
+	int SizeSubString = MyStrLen(subString);
+	if (SizeSubString > SizeString) return 0;
+	int flag = 1;
+	for (int i = 0; i < SizeSubString; i++)
+		if (string[pos + i] != subString[i]) flag = 0;
+	if (flag == 1) return 1;
+	else return 0;
+
+
+}
+
 void add(LIST* head, ENTRY* addValue)
 {
 	LIST* tmp;
@@ -199,6 +226,90 @@ void FindOnGrop(LIST* head, char* grup)
 	}
 }
 
+void FindOnStartSername(LIST* head, char* StartSername)
+{
+	while (head)
+	{
+		if (head->person.id != 0) {
+
+			if (FlagSubString(head->person.sernam,StartSername, 0) == 1 )
+			{
+				printf("%s %s %d %s %s\n", head->person.sernam, head->person.name, head->person.old, head->person.grup, head->person.telephonNumber);
+				for (int i = 0; i < 5; i++)
+				{
+					printf("%d ", head->person.assessments[i]);
+				}
+				printf("\n");
+			}
+		}
+		head = head->next;
+	}
+}
+
+void BinOutPut(LIST* head, char* FileName)
+{
+	FILE* f;
+	fopen_s(&f, FileName, "wb");
+	while (head)
+	{
+		if (head->person.id != 0) {
+			fwrite(head->person.name, sizeof(char), strlen(head->person.name), f);
+			fwrite(head->person.sernam, sizeof(char), strlen(head->person.sernam), f);
+			fwrite(head->person.old, sizeof(int), 1, f);
+			fwrite(head->person.telephonNumber, sizeof(char), strlen(head->person.telephonNumber), f);			
+			fwrite(f, sizeof(int),1, head->person.assessments);
+			
+		}
+		head = head->next;
+	}
+	fclose(f);
+
+}
+
+void BinInPut(LIST* head, char* FileName)
+{
+	FILE* f;
+	fopen_s(&f, FileName, "rb");
+	ENTRY addValue;
+	int k = 1;
+	char s[51];
+	while (!feof(f))
+	{
+
+		addValue.id = k;
+		k++;
+
+		fread(s,sizeof(char),50,f);
+		s[strlen(s) - 1] = 0;
+		addValue.sernam = (char*)malloc(strlen(s) * sizeof(char));
+		strcpy_s(addValue.sernam, strlen(s) + 1, s);
+
+		fread(s, sizeof(char), 50, f);
+		s[strlen(s) - 1] = 0;
+		addValue.name = (char*)malloc(strlen(s) * sizeof(char));
+		strcpy_s(addValue.name, strlen(s) + 1, s);
+
+		fread(&addValue.old, sizeof(int), 1, f);
+
+		fread(s, sizeof(char), 50, f);
+		s[strlen(s) - 1] = 0;
+		addValue.grup = (char*)malloc(strlen(s) * sizeof(char));
+		strcpy_s(addValue.grup, strlen(s) + 1, s);
+
+		fread(addValue.telephonNumber, sizeof(char), 50, f);
+		addValue.telephonNumber[strlen(addValue.telephonNumber) - 1] = 0;
+
+		char re;
+		for (int i = 0; i < 5; i++)
+		{
+			fread(&addValue.assessments, sizeof(int), 5, f);
+
+		}
+		add(head, &addValue);
+
+	}
+}
+
 int main()
 {
 	setlocale(LC_ALL, "Ru");
@@ -218,6 +329,10 @@ int main()
 		printf("5.Вывести учащихся в файл\n");
 		printf("6.Считать из файла\n");
 		printf("7.Вывести студентов из одной группы\n");
+		printf("8.Найти по началу фамилии\n");
+		printf("9.Вывести список в бинарный файл\n");
+		printf("10.Считаь из бинарного файла\n");
+
 
 		
 		scanf_s("%c", &key);
@@ -294,6 +409,23 @@ int main()
 			system("pause");
 			break;
 
+		case '8' :
+			printf("Введите Начало фамилии\n");
+			gets(s);
+			FindOnStartSername(head, s);
+			system("pause");
+			break;
+			
+		case '9' :
+			printf("Введитне название бинарного файла\n");
+			gets(FileName);
+			BinOutPut(head, FileName);
+			break;
+		case '10' :
+			printf("Введитне название бинарного файла\n");
+			gets(FileName);
+			BinOutPut(head, FileName);
+			break;
 		default:
 			exit(1);
 		}
